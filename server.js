@@ -25,11 +25,11 @@ const pool = new Pool(
 
 pool.connect();
 
-// Create a movie
+// Create an employee
 app.post('/api/new-employee', ({ body }, res) => {
-  const sql = `INSERT INTO movies (movie_name)
+  const sql = `INSERT INTO employee (first_name)
     VALUES ($1)`;
-  const params = [body.movie_name];
+  const params = [body.first_name];
 
   pool.query(sql, params, (err, result) => {
     if (err) {
@@ -43,9 +43,9 @@ app.post('/api/new-employee', ({ body }, res) => {
   });
 });
 
-// Read all movies
+// Read all employees
 app.get('/api/employees', (req, res) => {
-  const sql = `SELECT id, movie_name AS title FROM movies`;
+  const sql = `SELECT id, first_name AS first FROM employee`;
 
   pool.query(sql, (err, { rows }) => {
     if (err) {
@@ -59,9 +59,9 @@ app.get('/api/employees', (req, res) => {
   });
 });
 
-// Delete a movie
-app.delete('/api/movie/:id', (req, res) => {
-  const sql = `DELETE FROM movies WHERE id = $1`;
+// Delete an employee
+app.delete('/api/employees/:id', (req, res) => {
+  const sql = `DELETE FROM employee WHERE id = $1`;
   const params = [req.params.id];
 
   pool.query(sql, params, (err, result) => {
@@ -81,20 +81,6 @@ app.delete('/api/movie/:id', (req, res) => {
   });
 });
 
-// Read list of all reviews and associated movie name using LEFT JOIN
-app.get('/api/movie-reviews', (req, res) => {
-  const sql = `SELECT movies.movie_name AS movie, reviews.review FROM reviews LEFT JOIN movies ON reviews.movie_id = movies.id ORDER BY movies.movie_name;`;
-  pool.query(sql, (err, { rows }) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: rows
-    });
-  });
-});
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
