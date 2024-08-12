@@ -25,62 +25,61 @@ const pool = new Pool(
 
 pool.connect();
 
-// Create an employee
-app.post('/api/new-employee', ({ body }, res) => {
-  const sql = `INSERT INTO employee (first_name)
-    VALUES ($1)`;
-  const params = [body.first_name];
+// // Create an employee
+// app.post('/api/new-employee', ({ body }, res) => {
+//   const sql = `INSERT INTO employee (first_name, last_name)
+//     VALUES ($1)`;
+//   const params = [body.first_name, body.last_name];
 
-  pool.query(sql, params, (err, result) => {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: body
-    });
-  });
-});
+//   pool.query(sql, params, (err, result) => {
+//     if (err) {
+//       res.status(400).json({ error: err.message });
+//       return;
+//     }
+//     res.json({
+//       message: 'success',
+//       data: body
+//     });
+//   });
+// });
 
-// Read all employees
-app.get('/api/employees', (req, res) => {
-  const sql = `SELECT id, first_name AS first FROM employee`;
+// // Read all employees
+// app.get('/api/employees', (req, res) => {
+//   const sql = `SELECT id, first_name AS first FROM employee`;
 
-  pool.query(sql, (err, { rows }) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: rows
-    });
-  });
-});
+//   pool.query(sql, (err, { rows }) => {
+//     if (err) {
+//       res.status(500).json({ error: err.message });
+//       return;
+//     }
+//     res.json({
+//       message: 'success',
+//       data: rows
+//     });
+//   });
+// });
 
-// Delete an employee
-app.delete('/api/employees/:id', (req, res) => {
-  const sql = `DELETE FROM employee WHERE id = $1`;
-  const params = [req.params.id];
+// // Delete an employee
+// app.delete('/api/employees/:id', (req, res) => {
+//   const sql = `DELETE FROM employee WHERE id = $1`;
+//   const params = [req.params.id];
 
-  pool.query(sql, params, (err, result) => {
-    if (err) {
-      res.statusMessage(400).json({ error: err.message });
-    } else if (!result.rowCount) {
-      res.json({
-        message: 'Employee not found'
-      });
-    } else {
-      res.json({
-        message: 'deleted',
-        changes: result.rowCount,
-        id: req.params.id
-      });
-    }
-  });
-});
-
+//   pool.query(sql, params, (err, result) => {
+//     if (err) {
+//       res.statusMessage(400).json({ error: err.message });
+//     } else if (!result.rowCount) {
+//       res.json({
+//         message: 'Employee not found'
+//       });
+//     } else {
+//       res.json({
+//         message: 'deleted',
+//         changes: result.rowCount,
+//         id: req.params.id
+//       });
+//     }
+//   });
+// });
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
