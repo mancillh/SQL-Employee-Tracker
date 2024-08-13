@@ -1,5 +1,8 @@
 const express = require('express');
 
+//uses require() function built into NODE to include Inquirer (for prompting user for information)
+const inquirer = require("inquirer");
+
 // Import and require Pool (node-postgres)
 const { Pool } = require('pg');
 
@@ -25,61 +28,135 @@ const pool = new Pool(
 
 pool.connect();
 
-// // Create an employee
-// app.post('/api/new-employee', ({ body }, res) => {
-//   const sql = `INSERT INTO employee (first_name, last_name)
-//     VALUES ($1)`;
-//   const params = [body.first_name, body.last_name];
+// Add employee
+app.post('/api/new-employee', ({ body }, res) => {
+  const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
+    VALUES ($1)`;
+  const params = [body.first_name, body.last_name];
 
-//   pool.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.status(400).json({ error: err.message });
-//       return;
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: body
+    });
+  });
+});
+
+// View all employees
+app.get('/api/employees', (req, res) => {
+  const sql = `SELECT * FROM employees`;
+
+  pool.query(sql, (err, { rows }) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
+
+// Delete an employee
+app.delete('/api/employees/:id', (req, res) => {
+  const sql = `DELETE FROM employees WHERE id = $1`;
+  const params = [req.params.id];
+
+  pool.query(sql, params, (err, result) => {
+    if (err) {
+      res.statusMessage(400).json({ error: err.message });
+    } else if (!result.rowCount) {
+      res.json({
+        message: 'Employee not found'
+      });
+    } else {
+      res.json({
+        message: 'deleted',
+        changes: result.rowCount,
+        id: req.params.id
+      });
+    }
+  });
+});
+
+//an array of questions to ask the user via Inquirer
+function chooseAction(){
+  inquirer.prompt([
+  {
+    type: "list",
+    message: "What would you like to do?",
+    name: "action",
+    choices: ['View All Employees','Add Employee','Update Employee Role','View All Roles','Add Role','View All Departments','Add Department','Quit'],
+  }
+  ]).then (function(answers) {
+    console.log(answers);
+  })
+}
+ chooseAction()
+ 
+// function addEmployee(){
+//   inquirer.prompt([
+//     {
+//       type: "input",
+//       message: "What is the employee's first name?",
+//       name: "firstName",
+//     },
+//     {
+//       type: "input",
+//       message: "What is the employee's last name?",
+//       name: "lastName",
+//     },
+//     {
+//       type: "list",
+//       message: "What is the employee's role?",
+//       name: "employeeRole",
+//       choices: ['Sales Lead','Salesperson','Lead Engineer','Software Engineer','Account Manager','Accountant','Legal Team Lead', 'Lawyer', 'Customer Service'],
+//     },
+//     {
+//       type: "list",
+//       message: "Who is the employee's manager?",
+//       name: "employeeManager",
+//       choices: ['None','Elmer Fudd','Bugs Bunny','Daffy Duck','Wile E. Coyote','Tweety Bird'],
 //     }
-//     res.json({
-//       message: 'success',
-//       data: body
-//     });
-//   });
-// });
+//   ]).then (function(answers) {
+//     console.log(answers);
+//   })
+// }
 
-// // Read all employees
-// app.get('/api/employees', (req, res) => {
-//   const sql = `SELECT id, first_name AS first FROM employee`;
+// function addRole(){
+//   inquirer.prompt([
+//     {
+//       type: "input",
+//       message: "What is the name of the role?",
+//       name: "role"
+//     },
+//     {
+//       type: "input",
+//       message: "What is the salary of the role?",
+//       name: "salary"
+//     }    
+//   ]).then (function(answers) {
+//     console.log(answers);
+//   })
+// }
 
-//   pool.query(sql, (err, { rows }) => {
-//     if (err) {
-//       res.status(500).json({ error: err.message });
-//       return;
+// function addDepartment(){
+//   inquirer.prompt([
+//     {
+//       type: "input",
+//       message: "What is the name of the department?",
+//       name: "department"
 //     }
-//     res.json({
-//       message: 'success',
-//       data: rows
-//     });
-//   });
-// });
+//   ]).then (function(answers) {
+//     console.log(answers);
+//   })
+// }
 
-// // Delete an employee
-// app.delete('/api/employees/:id', (req, res) => {
-//   const sql = `DELETE FROM employee WHERE id = $1`;
-//   const params = [req.params.id];
-
-//   pool.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.statusMessage(400).json({ error: err.message });
-//     } else if (!result.rowCount) {
-//       res.json({
-//         message: 'Employee not found'
-//       });
-//     } else {
-//       res.json({
-//         message: 'deleted',
-//         changes: result.rowCount,
-//         id: req.params.id
-//       });
-//     }
-//   });
-// });
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
