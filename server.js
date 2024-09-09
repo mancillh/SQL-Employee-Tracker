@@ -29,8 +29,8 @@ const pool = new Pool(
 pool.connect();
 
 //an array of questions to ask the user via Inquirer
-const chooseAction = () => {
-  return inquirer.prompt([
+const chooseAction = async () => {
+  await inquirer.prompt([
   {
     type: 'list',
     message: 'What would you like to do?',
@@ -45,31 +45,31 @@ const chooseAction = () => {
       'Add Department',
       'Quit'],
   },
-  ]).then ((answers) => {
+  ]).then (async (answers) => {
     switch(answers.action){
       case 'View All Employees':
-        viewEmployees();
+        await viewEmployees();
         break;
       case 'Add Employee':
-        createEmployee();
+        await createEmployee();
         break;
       case 'Update Employee Role':
-        updateEmployee();
+        await updateEmployee();
         break;    
       case 'View All Roles':
-        viewRoles();
+        await viewRoles();
         break;
       case 'Add Role':
-        addRole();
+        await addRole();
         break;
       case 'View All Departments':
-        viewDepartments();
+        await viewDepartments();
         break;
       case 'Add Department':
-        createDepartment();
+        await createDepartment();
         break;
       case 'Quit':
-        quit();
+        await quit();
         break;
     }}).catch((error) => {
       console.error('Error during prompt:', error)
@@ -81,12 +81,12 @@ const chooseAction = () => {
 // View all employees
 const viewEmployees = async () => {
   try {
-    const sql = 'SELECT * FROM employee';
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id`;
     const res = await pool.query(sql);
     console.table(res.rows);
     chooseAction();
   } catch (err) {
-    console.error('Error Viewing Employees', err);
+    console.error('Error Viewing All Employees', err);
   }
 };
 
