@@ -78,17 +78,17 @@ const chooseAction = () => {
 
  chooseAction();
 
-// // View all employees
-// const viewEmployees = async () => {
-//   try {
-//     const sql = 'SELECT first_name FROM employee';
-//     const res = await pool.query(sql);
-//     console.table(res.rows);
-//     chooseAction();
-//   } catch (err) {
-//     console.error('Error Viewing Employees', err);
-//   }
-// };
+// View all employees
+const viewEmployees = async () => {
+  try {
+    const sql = 'SELECT * FROM employee';
+    const res = await pool.query(sql);
+    console.table(res.rows);
+    chooseAction();
+  } catch (err) {
+    console.error('Error Viewing Employees', err);
+  }
+};
 
 // // Add employee
 // function createEmployee() {
