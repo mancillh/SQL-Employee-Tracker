@@ -78,20 +78,17 @@ const chooseAction = () => {
 
  chooseAction();
 
-//  // View all employees
-// function viewEmployees() {
-//   const sql = 
-//    `SELECT * FROM employee`; 
-//       pool.query(sql, (err, { rows }) => {
-//         if (err) {
-//             console.log(err)
-//         }
-//         else {
-//             console.table(rows)
-//             chooseAction()
-//         }
-//     })
-// }
+// // View all employees
+// const viewEmployees = async () => {
+//   try {
+//     const sql = 'SELECT first_name FROM employee';
+//     const res = await pool.query(sql);
+//     console.table(res.rows);
+//     chooseAction();
+//   } catch (err) {
+//     console.error('Error Viewing Employees', err);
+//   }
+// };
 
 // // Add employee
 // function createEmployee() {
@@ -181,23 +178,17 @@ const chooseAction = () => {
 //   });
 // });
 
-// // View Roles
-// function viewRoles() {
-//   app.get('/api/movies', (req, res) => {
-//     const sql = `SELECT id, movie_name AS title FROM movies`;
-  
-//     pool.query(sql, (err, { rows }) => {
-//       if (err) {
-//         res.status(500).json({ error: err.message });
-//         return;
-//       }
-//       res.json({
-//         message: 'success',
-//         data: rows
-//       });
-//     });
-//   });
-
+// View Roles
+const viewRoles = async () => {
+  try {
+    const sql = 'SELECT *  FROM role';
+    const res = await pool.query(sql);
+    console.table(res.rows);
+    chooseAction();
+  } catch (err) {
+    console.error('Error Viewing Roles', err);
+  }
+};
 //   // Add Role
 // function addRole(){
 //   inquirer.prompt([
@@ -216,28 +207,10 @@ const chooseAction = () => {
 //   })
 // }
 
-
-// // View Departments
-// function viewDepartments() {
-//   app.get('/api/movies', (req, res) => {
-//     const sql = `SELECT id, movie_name AS title FROM movies`;
-  
-//     pool.query(sql, (err, { rows }) => {
-//       if (err) {
-//         res.status(500).json({ error: err.message });
-//         return;
-//       }
-//       res.json({
-//         message: 'success',
-//         data: rows
-//       });
-//     });
-//   });
-
 const viewDepartments = async () => {
   try {
-    const query = 'SELECT *  FROM department';
-    const res = await pool.query(query);
+    const sql = 'SELECT *  FROM department';
+    const res = await pool.query(sql);
     console.table(res.rows);
     chooseAction();
   } catch (err) {
