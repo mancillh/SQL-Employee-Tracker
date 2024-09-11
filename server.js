@@ -277,7 +277,10 @@ const createDepartment = async () => {
   chooseAction();
 };
 
-// // Quit
+// Quit
+const quit = async () => {
+  await process.exit();
+};
 
 // // Default response for any other request (Not Found)
 // app.use((req, res) => {
