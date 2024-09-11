@@ -69,28 +69,7 @@ const listManagers = async () => {
     console.error('Error gathering roles', err);
   }
       return []
-};;
-//     const managersQuery = `SELECT e.id, e.first_name, e.last_name FROM employee e`;
-//     const managersResult = await pool.query(managersQuery);
-//     const managers = managersResult.rows;
-
-//     const managersChoices = managers.map(manager => ({
-//       name: `${manager.first_name} ${manager.last_name}`,
-//       value: manager.id
-// };
-
-// Helps create Inquirer choice list, lists all managers from employee table
-// const listManagers = async () => {
-//   try {
-//   return pool.query(`SELECT CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employee LEFT JOIN employee manager ON manager.id = employee.manager_id;`)
-//   .then(( {rows} ) => rows)
-//   } catch (err) {
-//     console.error('Error gathering managers', err);
-//   }
-//       return []
-// };
-
-// * FROM employee WHERE manager_id IS NULL;
+};
 
 //an array of questions to ask the user via Inquirer
 const chooseAction = async () => {
@@ -185,11 +164,6 @@ const createEmployee = async () => {
   })
   chooseAction();
 };
-
-
-
-
-// const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
 
 // // Delete an employee
 // app.delete('/api/employees/:id', (req, res) => {
