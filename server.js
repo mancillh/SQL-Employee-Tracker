@@ -32,7 +32,11 @@ pool.connect();
 const listDepartments = async () => {
   try {
   return pool.query(`SELECT * FROM department;`)
-  .then(( {rows} ) => rows)
+  .then(( {rows} ) => 
+    rows.map(department => ({
+      name: `${department.name}`,
+      value: department.id
+    })))
   } catch (err) {
     console.error('Error gathering departments', err);
   }
@@ -220,23 +224,32 @@ const viewRoles = async () => {
     console.error('Error Viewing Roles', err);
   }
 };
-//   // Add Role
-// function addRole(){
-//   inquirer.prompt([
-//     {
-//       type: "input",
-//       message: "What is the name of the role?",
-//       name: "role"
-//     },
-//     {
-//       type: "input",
-//       message: "What is the salary of the role?",
-//       name: "salary"
-//     }    
-//   ]).then (function(answers) {
-//     console.log(answers);
-//   })
-// }
+
+// Create Role
+const addRole = async () => {
+  await inquirer.prompt([
+    {
+      type: "list",
+      message: "Which Department?",
+      name: "department",
+      choices: await listDepartments(),
+    },
+    {
+      type: "input",
+      message: "What is the name of the role?",
+      name: "role"
+    },
+    {
+      type: "input",
+      message: "What is the salary of the role?",
+      name: "salary"
+    }    
+  ]).then(async(answers) => {
+    const res = await pool.query('INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3) RETURNING *', [answers.role, answers.salary, answers.department]);
+    return res.rows[0];
+  })
+  chooseAction();
+};
 
 const viewDepartments = async () => {
   try {
