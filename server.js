@@ -262,18 +262,20 @@ const viewDepartments = async () => {
   }
 };
 
-//   //Add Department
-// function addDepartment(){
-//   inquirer.prompt([
-//     {
-//       type: "input",
-//       message: "What is the name of the department?",
-//       name: "department"
-//     }
-//   ]).then (function(answers) {
-//     console.log(answers);
-//   })
-// }
+  //Add Department
+const createDepartment = async () => {
+  await inquirer.prompt([
+    {
+      type: "input",
+      message: "What is the name of the department?",
+      name: "department"
+    }
+  ]).then(async(answers) => {
+    const res = await pool.query('INSERT INTO department (name) VALUES ($1) RETURNING *', [answers.department]);
+    return res.rows[0];
+  })
+  chooseAction();
+};
 
 // // Quit
 
