@@ -59,6 +59,22 @@ const listRoles = async () => {
       return []
 };;
 
+// Helps create Inquirer choice list, lists all employees from employee table
+const listEmployees = async () => {
+  try {
+    return pool.query(`SELECT employee.id, employee.first_name, employee.last_name FROM employee;`)
+   .then(( {rows} ) =>
+
+    rows.map(employee => ({
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id
+    })))
+  }  catch (err) {
+    console.error('Error gathering employees', err);
+  }
+      return []
+};
+
 // Helps create Inquirer choice list, lists all managers from employee table
 const listManagers = async () => {
   try {
@@ -70,7 +86,7 @@ const listManagers = async () => {
       value: employee.id
     })))
   }  catch (err) {
-    console.error('Error gathering roles', err);
+    console.error('Error gathering managers', err);
   }
       return []
 };
@@ -169,49 +185,27 @@ const createEmployee = async () => {
   chooseAction();
 };
 
-// // Delete an employee
-// app.delete('/api/employees/:id', (req, res) => {
-//   const sql = `DELETE FROM employees WHERE id = $1`;
-//   const params = [req.params.id];
-
-//   pool.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.statusMessage(400).json({ error: err.message });
-//     } else if (!result.rowCount) {
-//       res.json({
-//         message: 'Employee not found'
-//       });
-//     } else {
-//       res.json({
-//         message: 'deleted',
-//         changes: result.rowCount,
-//         id: req.params.id
-//       });
-//     }
-//   });
-// });
-
-// //Update Employee Role
-// app.put('/api/review/:id', (req, res) => {
-//   const sql = `UPDATE reviews SET review = $1 WHERE id = $2`;
-//   const params = [req.body.review, req.params.id];
-
-//   pool.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.status(400).json({ error: err.message });
-//     } else if (!result.rowCount) {
-//       res.json({
-//         message: 'Review not found'
-//       });
-//     } else {
-//       res.json({
-//         message: 'success',
-//         data: req.body,
-//         changes: result.rowCount
-//       });
-//     }
-//   });
-// });
+//Update Employee Role
+const updateEmployee = async () => {
+  await inquirer.prompt([
+  {
+    type: "list",
+    message: "Which employee would you like to update?",
+    name: "employeeName",
+    choices: await listEmployees(),
+  },
+  {
+    type: "list",
+    message: "What is the employee's new role?",
+    name: "employeeRole",
+    choices: await listRoles(),
+  },
+]).then(async (answers) => {
+  const res = await pool.query('UPDATE employee SET role_id = $1 WHERE id = $2', [answers.employeeRole, answers.employeeName]);
+  return res.rows[0];
+})
+chooseAction();
+};
 
 // View Roles
 const viewRoles = async () => {
@@ -281,12 +275,3 @@ const createDepartment = async () => {
 const quit = async () => {
   await process.exit();
 };
-
-// // Default response for any other request (Not Found)
-// app.use((req, res) => {
-//   res.status(404).end();
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
