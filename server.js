@@ -28,6 +28,70 @@ const pool = new Pool(
 
 pool.connect();
 
+// Helps create Inquirer choice list, lists all departments from department table
+const listDepartments = async () => {
+  try {
+  return pool.query(`SELECT * FROM department;`)
+  .then(( {rows} ) => rows)
+  } catch (err) {
+    console.error('Error gathering departments', err);
+  }
+      return []
+};
+
+// Helps create Inquirer choice list, lists all roles from role table
+const listRoles = async () => {
+  try {
+    return pool.query(`SELECT role.id, role.title FROM role;`)
+   .then(( {rows} ) =>
+
+    rows.map(role => ({
+      name: `${role.title}`,
+      value: role.id
+    })))
+  }  catch (err) {
+    console.error('Error gathering roles', err);
+  }
+      return []
+};;
+
+// Helps create Inquirer choice list, lists all managers from employee table
+const listManagers = async () => {
+  try {
+    return pool.query(`SELECT employee.id, employee.first_name, employee.last_name FROM employee WHERE manager_id IS NULL;`)
+   .then(( {rows} ) =>
+
+    rows.map(employee => ({
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id
+    })))
+  }  catch (err) {
+    console.error('Error gathering roles', err);
+  }
+      return []
+};;
+//     const managersQuery = `SELECT e.id, e.first_name, e.last_name FROM employee e`;
+//     const managersResult = await pool.query(managersQuery);
+//     const managers = managersResult.rows;
+
+//     const managersChoices = managers.map(manager => ({
+//       name: `${manager.first_name} ${manager.last_name}`,
+//       value: manager.id
+// };
+
+// Helps create Inquirer choice list, lists all managers from employee table
+// const listManagers = async () => {
+//   try {
+//   return pool.query(`SELECT CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employee LEFT JOIN employee manager ON manager.id = employee.manager_id;`)
+//   .then(( {rows} ) => rows)
+//   } catch (err) {
+//     console.error('Error gathering managers', err);
+//   }
+//       return []
+// };
+
+// * FROM employee WHERE manager_id IS NULL;
+
 //an array of questions to ask the user via Inquirer
 const chooseAction = async () => {
   await inquirer.prompt([
@@ -90,49 +154,42 @@ const viewEmployees = async () => {
   }
 };
 
-// // Add employee
-// function createEmployee() {
-//     inquirer.prompt([
-//     {
-//       type: "input",
-//       message: "What is the employee's first name?",
-//       name: "firstName",
-//     },
-//     {
-//       type: "input",
-//       message: "What is the employee's last name?",
-//       name: "lastName",
-//     },
-//     {
-//       type: "list",
-//       message: "What is the employee's role?",
-//       name: "employeeRole",
-//       choices: ['Sales Lead','Salesperson','Lead Engineer','Software Engineer','Account Manager','Accountant','Legal Team Lead', 'Lawyer', 'Customer Service'],
-//     },
-//     {
-//       type: "list",
-//       message: "Who is the employee's manager?",
-//       name: "employeeManager",
-//       choices: ['None','Elmer Fudd','Bugs Bunny','Daffy Duck','Wile E. Coyote','Tweety Bird'],
-//     }
-//   ])
-// app.post('/api/new-employee', ({ body }, res) => {
-//   const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
-//     VALUES ($1)`;
-//   const params = [body.first_name, body.last_name];
+// Create employee
+const createEmployee = async () => {
+    await inquirer.prompt([
+    {
+      type: "input",
+      message: "What is the employee's first name?",
+      name: "firstName",
+    },
+    {
+      type: "input",
+      message: "What is the employee's last name?",
+      name: "lastName",
+    },
+    {
+      type: "list",
+      message: "What is the employee's role?",
+      name: "employeeRole",
+      choices: await listRoles(),
+    },
+    {
+      type: "list",
+      message: "Who is the employee's manager?",
+      name: "employeeManager",
+      choices: await listManagers(),
+    }
+  ]).then(async (answers) => {
+    const res = await pool.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4) RETURNING *', [answers.firstName, answers.lastName, answers.employeeRole, answers.employeeManager]);
+    return res.rows[0];
+  })
+  chooseAction();
+};
 
-//   pool.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.status(400).json({ error: err.message });
-//       return;
-//     }
-//     res.json({
-//       message: 'success',
-//       data: body
-//     });
-//   });
-// });
-// }
+
+
+
+// const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
 
 // // Delete an employee
 // app.delete('/api/employees/:id', (req, res) => {
