@@ -148,7 +148,7 @@ const chooseAction = async () => {
 // View all employees
 const viewEmployees = async () => {
   try {
-    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id`;
+    const sql = `SELECT employee.id AS employee_id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id`;
     const res = await pool.query(sql);
     console.table(res.rows);
     chooseAction();
@@ -214,7 +214,7 @@ chooseAction();
 // View Roles
 const viewRoles = async () => {
   try {
-    const sql = 'SELECT title AS job_title, salary, department.name AS department FROM role JOIN department ON role.department_id = department.id ';
+    const sql = 'SELECT title AS job_title, role.id AS role_id, salary, department.name AS department FROM role JOIN department ON role.department_id = department.id ';
     const res = await pool.query(sql);
     console.table(res.rows);
     chooseAction();
